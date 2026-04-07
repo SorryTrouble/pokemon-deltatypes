@@ -88,7 +88,7 @@ enum ItemEffect
 // for Natural Gift and Fling
 struct TypePower
 {
-    enum Type type:8;
+    enum Type type:5; //up to 32
     u8 power;
     u16 effect;
 };

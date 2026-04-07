@@ -2966,7 +2966,7 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
         case TYPE_FIRE: // Burn Up
             gBattlescriptCurrInstr = BattleScript_RemoveFireType;
             break;
-        case TYPE_ELECTRIC: // Double Shot
+        case TYPE_ELEC: // Double Shot
             gBattlescriptCurrInstr = BattleScript_RemoveElectricType;
             break;
         default:
@@ -10444,7 +10444,7 @@ static void Cmd_settypetoenvironment(void)
     switch (gFieldStatuses & STATUS_FIELD_TERRAIN_ANY)
     {
     case STATUS_FIELD_ELECTRIC_TERRAIN:
-        environmentType = TYPE_ELECTRIC;
+        environmentType = TYPE_ELEC;
         break;
     case STATUS_FIELD_GRASSY_TERRAIN:
         environmentType = TYPE_GRASS;

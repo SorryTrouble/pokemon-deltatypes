@@ -378,7 +378,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
             "sharp claws."),
         .effect = EFFECT_HIT,
         .power = 40,
-        .type = TYPE_NORMAL,
+        .type = TYPE_RUDE,
         .accuracy = 100,
         .pp = 35,
         .target = TARGET_SELECTED,

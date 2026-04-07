@@ -77,7 +77,7 @@ struct MoveInfo
     const u8 *name;
     const u8 *description;
     enum BattleMoveEffects effect;
-    enum Type type:5;     // Up to 32
+    enum Type type:6;     // Up to 64
     enum DamageCategory category:2;
     u16 power:9;    // up to 511
     // end of word
