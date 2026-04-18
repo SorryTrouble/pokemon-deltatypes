@@ -15136,7 +15136,7 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
             "the moon. May lower Sp. Atk."),
         .effect = EFFECT_HIT,
         .power = 95,
-        .type = TYPE_FAIRY,
+        .type = TYPE_STAR,
         .accuracy = 100,
         .pp = 15,
         .target = TARGET_SELECTED,

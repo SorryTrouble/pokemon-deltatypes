@@ -41,14 +41,14 @@ const struct GimmickInfo gGimmicksInfo[GIMMICKS_COUNT] =
         .CanActivate = CanDynamax,
         .ActivateGimmick = ActivateDynamax,
     },
-    [GIMMICK_TERA] =
-    {
-        .triggerSheet = &sSpriteSheet_TeraTrigger,
-        .triggerPal = &sSpritePalette_TeraTrigger,
-        .triggerTemplate = &sSpriteTemplate_GimmickTrigger,
-        .indicatorData = NULL, // handled separately
-        .indicatorPalTag = TAG_TERA_INDICATOR_PAL,
-        .CanActivate = CanTerastallize,
-        .ActivateGimmick = ActivateTera,
-    }
+    // [GIMMICK_TERA] =
+    // {
+    //     .triggerSheet = &sSpriteSheet_TeraTrigger,
+    //     .triggerPal = &sSpritePalette_TeraTrigger,
+    //     .triggerTemplate = &sSpriteTemplate_GimmickTrigger,
+    //     .indicatorData = NULL, // handled separately
+    //     .indicatorPalTag = TAG_TERA_INDICATOR_PAL,
+    //     .CanActivate = CanTerastallize,
+    //     .ActivateGimmick = ActivateTera,
+    // }
 };

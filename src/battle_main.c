@@ -2042,12 +2042,12 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 u32 data = partyData[monIndex].gigantamaxFactor;
                 SetMonData(&party[i], MON_DATA_GIGANTAMAX_FACTOR, &data);
             }
-            if (partyData[monIndex].teraType > 0)
-            {
-                gBattleStruct->opponentMonCanTera |= 1 << i;
-                enum Type data = partyData[monIndex].teraType;
-                SetMonData(&party[i], MON_DATA_TERA_TYPE, &data);
-            }
+            // if (partyData[monIndex].teraType > 0)
+            // {
+            //     gBattleStruct->opponentMonCanTera |= 1 << i;
+            //     enum Type data = partyData[monIndex].teraType;
+            //     SetMonData(&party[i], MON_DATA_TERA_TYPE, &data);
+            // }
             CalculateMonStats(&party[i]);
 
             if (B_TRAINER_CLASS_POKE_BALLS >= GEN_7 && ball == -1)

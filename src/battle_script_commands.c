@@ -944,7 +944,7 @@ bool32 ProteanTryChangeType(enum BattlerId battler, enum Ability ability, enum M
          && (gBattleMons[battler].types[0] != moveType || gBattleMons[battler].types[1] != moveType
              || (gBattleMons[battler].types[2] != moveType && gBattleMons[battler].types[2] != TYPE_MYSTERY))
          && move != MOVE_STRUGGLE
-         && GetActiveGimmick(battler) != GIMMICK_TERA)
+         /*&& GetActiveGimmick(battler) != GIMMICK_TERA*/)
     {
         SET_BATTLER_TYPE(battler, moveType);
         return TRUE;
@@ -1285,7 +1285,7 @@ static inline void CalculateAndSetMoveDamage(struct BattleContext *ctx)
     if (gSpecialStatuses[ctx->battlerDef].distortedTypeMatchups && IsBattlerUnaffectedByMove(ctx->battlerDef))
     {
         gSpecialStatuses[ctx->battlerDef].distortedTypeMatchups = FALSE;
-        gSpecialStatuses[ctx->battlerDef].teraShellAbilityDone = FALSE;
+        // gSpecialStatuses[ctx->battlerDef].teraShellAbilityDone = FALSE;
     }
 }
 
@@ -1461,17 +1461,17 @@ static inline bool32 TryStrongWindsWeakenAttack(enum BattlerId battlerDef, enum 
     return FALSE;
 }
 
-static inline bool32 TryTeraShellDistortTypeMatchups(enum BattlerId battlerDef)
-{
-    if (gSpecialStatuses[battlerDef].teraShellAbilityDone)
-    {
-        gSpecialStatuses[battlerDef].teraShellAbilityDone = FALSE;
-        gBattleScripting.battler = battlerDef;
-        BattleScriptCall(BattleScript_TeraShellDistortingTypeMatchups);
-        return TRUE;
-    }
-    return FALSE;
-}
+// static inline bool32 TryTeraShellDistortTypeMatchups(enum BattlerId battlerDef)
+// {
+//     if (gSpecialStatuses[battlerDef].teraShellAbilityDone)
+//     {
+//         gSpecialStatuses[battlerDef].teraShellAbilityDone = FALSE;
+//         gBattleScripting.battler = battlerDef;
+//         BattleScriptCall(BattleScript_TeraShellDistortingTypeMatchups);
+//         return TRUE;
+//     }
+//     return FALSE;
+// }
 
 // According to Gen5 Weakness berry activation happens after the attackanimation.
 // It doesn't have any impact on gameplay and is only a visual thing which can be adjusted later.
@@ -1514,8 +1514,8 @@ static bool32 ProcessPreAttackAnimationFuncs(void)
         {
             if (IsBattlerInvalidForSpreadMove(gBattlerAttacker, battlerDef))
                 continue;
-            if (TryTeraShellDistortTypeMatchups(battlerDef))
-                return TRUE;
+            // if (TryTeraShellDistortTypeMatchups(battlerDef))
+            //     return TRUE;
             if (TryActivateWeaknessBerry(battlerDef))
                 return TRUE;
         }
@@ -1524,8 +1524,8 @@ static bool32 ProcessPreAttackAnimationFuncs(void)
     {
         if (TryStrongWindsWeakenAttack(gBattlerTarget, moveType))
             return TRUE;
-        if (TryTeraShellDistortTypeMatchups(gBattlerTarget))
-            return TRUE;
+        // if (TryTeraShellDistortTypeMatchups(gBattlerTarget))
+        //     return TRUE;
         if (TryActivateWeaknessBerry(gBattlerTarget))
             return TRUE;
     }
@@ -3059,15 +3059,15 @@ void SetMoveEffect(enum BattlerId battlerAtk, enum BattlerId effectBattler, enum
         }
         break;
     }
-    case MOVE_EFFECT_TERA_BLAST:
-        if (GetActiveGimmick(gEffectBattler) == GIMMICK_TERA
-            && GetBattlerTeraType(gEffectBattler) == TYPE_STELLAR
-            && !NoAliveMonsForEitherParty())
-        {
-            BattleScriptPush(battleScript);
-            gBattlescriptCurrInstr = BattleScript_LowerAtkSpAtk;
-        }
-        break;
+    // case MOVE_EFFECT_TERA_BLAST:
+    //     if (GetActiveGimmick(gEffectBattler) == GIMMICK_TERA
+    //         && GetBattlerTeraType(gEffectBattler) == TYPE_STELLAR
+    //         && !NoAliveMonsForEitherParty())
+    //     {
+    //         BattleScriptPush(battleScript);
+    //         gBattlescriptCurrInstr = BattleScript_LowerAtkSpAtk;
+    //     }
+    //     break;
     case MOVE_EFFECT_ORDER_UP:
         {
             enum Stat stat = 0;
@@ -5062,8 +5062,8 @@ static void PlayAnimation(enum BattlerId battler, u8 animId, const u16 *argPtr, 
      || animId == B_ANIM_PRIMAL_REVERSION
      || animId == B_ANIM_POWER_CONSTRUCT
      || animId == B_ANIM_ULTRA_BURST
-     || animId == B_ANIM_TERA_CHARGE
-     || animId == B_ANIM_TERA_ACTIVATE
+    //  || animId == B_ANIM_TERA_CHARGE
+    //  || animId == B_ANIM_TERA_ACTIVATE
      || animId == B_ANIM_FORM_CHANGE_INSTANT)
     {
         BtlController_EmitBattleAnimation(battler, B_COMM_TO_CONTROLLER, animId, *argPtr);
@@ -8291,11 +8291,11 @@ static void Cmd_tryconversiontypechange(void)
     u8 moveChecked = 0;
     u8 moveType = 0;
 
-    if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
-    {
-        gBattlescriptCurrInstr = cmd->failInstr;
-        return;
-    }
+    // if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
+    // {
+    //     gBattlescriptCurrInstr = cmd->failInstr;
+    //     return;
+    // }
 
     if (B_UPDATED_CONVERSION >= GEN_6)
     {
@@ -8851,10 +8851,10 @@ static void Cmd_settypetorandomresistance(void)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
     }
-    else if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
-    {
-        gBattlescriptCurrInstr = cmd->failInstr;
-    }
+    // else if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
+    // {
+    //     gBattlescriptCurrInstr = cmd->failInstr;
+    // }
     else if (typeToCheck == TYPE_NONE || typeToCheck == TYPE_STELLAR || typeToCheck == TYPE_MYSTERY)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
@@ -10464,7 +10464,7 @@ static void Cmd_settypetoenvironment(void)
         break;
     }
 
-    if (!IS_BATTLER_OF_TYPE(gBattlerAttacker, environmentType) && GetActiveGimmick(gBattlerAttacker) != GIMMICK_TERA)
+    if (!IS_BATTLER_OF_TYPE(gBattlerAttacker, environmentType) /*&& GetActiveGimmick(gBattlerAttacker) != GIMMICK_TERA*/)
     {
         SET_BATTLER_TYPE(gBattlerAttacker, environmentType);
         PREPARE_TYPE_BUFFER(gBattleTextBuff1, environmentType);
@@ -12176,10 +12176,10 @@ void BS_TryReflectType(void)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
     }
-    else if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
-    {
-        gBattlescriptCurrInstr = cmd->failInstr;
-    }
+    // else if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA)
+    // {
+    //     gBattlescriptCurrInstr = cmd->failInstr;
+    // }
     else if (IS_BATTLER_TYPELESS(gBattlerTarget))
     {
         gBattlescriptCurrInstr = cmd->failInstr;
@@ -12623,12 +12623,12 @@ void BS_RemoveWeather(void)
     gBattlescriptCurrInstr = cmd->nextInstr;
 }
 
-void BS_ApplyTerastallization(void)
-{
-    NATIVE_ARGS();
-    ApplyBattlerVisualsForTeraAnim(gBattlerAttacker);
-    gBattlescriptCurrInstr = cmd->nextInstr;
-}
+// void BS_ApplyTerastallization(void)
+// {
+//     NATIVE_ARGS();
+//     ApplyBattlerVisualsForTeraAnim(gBattlerAttacker);
+//     gBattlescriptCurrInstr = cmd->nextInstr;
+// }
 
 void BS_JumpIfSleepClause(void)
 {
@@ -12652,7 +12652,7 @@ void BS_JumpIfSleepClause(void)
 void BS_TryTarShot(void)
 {
     NATIVE_ARGS(const u8 *failInstr);
-    if (gBattleMons[gBattlerTarget].volatiles.tarShot || GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA)
+    if (gBattleMons[gBattlerTarget].volatiles.tarShot /*|| GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA*/)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
     }
@@ -12667,7 +12667,7 @@ void BS_CanTarShotWork(void)
 {
     NATIVE_ARGS(const u8 *failInstr);
     // Tar Shot fails if the target can't be made weaker to fire and it's speed can't be lowered further
-    if (!(gBattleMons[gBattlerTarget].volatiles.tarShot || GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA)
+    if (!(gBattleMons[gBattlerTarget].volatiles.tarShot /*|| GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA*/)
      || CompareStat(gBattlerTarget, STAT_SPEED, MAX_STAT_STAGE, CMP_LESS_THAN, GetBattlerAbility(gBattlerTarget)))
         gBattlescriptCurrInstr = cmd->nextInstr;
     else
@@ -13927,8 +13927,8 @@ void BS_SwitchinAbilities(void)
     enum BattlerId battler = GetBattlerForBattleScript(cmd->battler);
     enum Ability ability = GetBattlerAbility(battler);
     gBattlescriptCurrInstr = cmd->nextInstr;
-    if (AbilityBattleEffects(ABILITYEFFECT_TERA_SHIFT, battler, ability, MOVE_NONE, TRUE)
-     || AbilityBattleEffects(ABILITYEFFECT_NEUTRALIZINGGAS, battler, ability, MOVE_NONE, TRUE)
+    if (/*AbilityBattleEffects(ABILITYEFFECT_TERA_SHIFT, battler, ability, MOVE_NONE, TRUE)
+     ||*/ AbilityBattleEffects(ABILITYEFFECT_NEUTRALIZINGGAS, battler, ability, MOVE_NONE, TRUE)
      || AbilityBattleEffects(ABILITYEFFECT_UNNERVE, battler, ability, MOVE_NONE, TRUE)
      || AbilityBattleEffects(ABILITYEFFECT_ON_SWITCHIN, battler, ability, MOVE_NONE, TRUE)
      || AbilityBattleEffects(ABILITYEFFECT_IMMUNITY, battler, ability, MOVE_NONE, TRUE)
@@ -14134,7 +14134,7 @@ void BS_TrySoak(void)
     GetBattlerTypes(gBattlerTarget, FALSE, types);
     enum Type typeToSet = GetMoveArgType(gCurrentMove);
     if ((types[0] == typeToSet && types[1] == typeToSet)
-     || GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA)
+     /*|| GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA*/)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
     }
@@ -14488,7 +14488,7 @@ void BS_TryThirdType(void)
 {
     NATIVE_ARGS(const u8 *failInstr);
     u32 type = GetMoveArgType(gCurrentMove);
-    if (IS_BATTLER_OF_TYPE(gBattlerTarget, type) || GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA)
+    if (IS_BATTLER_OF_TYPE(gBattlerTarget, type) /*|| GetActiveGimmick(gBattlerTarget) == GIMMICK_TERA*/)
     {
         gBattlescriptCurrInstr = cmd->failInstr;
     }

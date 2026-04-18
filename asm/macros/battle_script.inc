@@ -1477,10 +1477,6 @@
 	callnative BS_RemoveWeather
 	.endm
 
-	.macro applyterastallization
-	callnative BS_ApplyTerastallization
-	.endm
-
 	.macro jumpifsleepclause jumpInstr:req
 	callnative BS_JumpIfSleepClause
 	.4byte \jumpInstr

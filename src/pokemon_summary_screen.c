@@ -937,6 +937,130 @@ static const union AnimCmd sSpriteAnim_TypeStellar[] = {
     ANIMCMD_FRAME(TYPE_STELLAR * 8, 0, FALSE, FALSE),
     ANIMCMD_END
 };
+static const union AnimCmd sSpriteAnim_TypeDefault[] = {
+    ANIMCMD_FRAME(TYPE_DEFAULT * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeStar[] = {
+    ANIMCMD_FRAME(TYPE_STAR * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypePuppet[] = {
+    ANIMCMD_FRAME(TYPE_PUPPET * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeCat[] = {
+    ANIMCMD_FRAME(TYPE_CAT * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeElec[] = {
+    ANIMCMD_FRAME(TYPE_ELEC * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeHoly[] = {
+    ANIMCMD_FRAME(TYPE_HOLY * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeDeath[] = {
+    ANIMCMD_FRAME(TYPE_DEATH * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeScythe[] = {
+    ANIMCMD_FRAME(TYPE_SCYTHE * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeRude[] = {
+    ANIMCMD_FRAME(TYPE_RUDE * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeRed[] = {
+    ANIMCMD_FRAME(TYPE_RED * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeJewel[] = {
+    ANIMCMD_FRAME(TYPE_JEWEL * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeHeart[] = {
+    ANIMCMD_FRAME(TYPE_HEART * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeOrder[] = {
+    ANIMCMD_FRAME(TYPE_ORDER * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeRabbit[] = {
+    ANIMCMD_FRAME(TYPE_RABBIT * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeDust[] = {
+    ANIMCMD_FRAME(TYPE_DUST * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeFight[] = {
+    ANIMCMD_FRAME(TYPE_FIGHT * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeMouse[] = {
+    ANIMCMD_FRAME(TYPE_MOUSE * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypePuzz[] = {
+    ANIMCMD_FRAME(TYPE_PUZZ * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeBlade[] = {
+    ANIMCMD_FRAME(TYPE_BLADE * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_TypeChaos[] = {
+    ANIMCMD_FRAME(TYPE_CHAOS * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeVirus[] = {
+    ANIMCMD_FRAME(TYPE_VIRUS * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeColor[] = {
+    ANIMCMD_FRAME(TYPE_COLOR * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeMusic[] = {
+    ANIMCMD_FRAME(TYPE_MUSIC * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeCopy[] = {
+    ANIMCMD_FRAME(TYPE_COPY * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeFrog[] = {
+    ANIMCMD_FRAME(TYPE_FROG * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeLuck[] = {
+    ANIMCMD_FRAME(TYPE_LUCK * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_TypeWind[] = {
+    ANIMCMD_FRAME(TYPE_WIND * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeSpirit[] = {
+    ANIMCMD_FRAME(TYPE_SPIRIT * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
+static const union AnimCmd sSpriteAnim_TypeSmell[] = {
+    ANIMCMD_FRAME(TYPE_SMELL * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+static const union AnimCmd sSpriteAnim_TypeMagic[] = {
+    ANIMCMD_FRAME(TYPE_MAGIC * 8, 0, FALSE, FALSE),
+    ANIMCMD_END
+};
+
 static const union AnimCmd sSpriteAnim_CategoryCool[] = {
     ANIMCMD_FRAME((CONTEST_CATEGORY_COOL + NUMBER_OF_MON_TYPES) * 8, 0, FALSE, FALSE),
     ANIMCMD_END
@@ -967,18 +1091,50 @@ static const union AnimCmd *const sSpriteAnimTable_MoveTypes[NUMBER_OF_MON_TYPES
     [TYPE_ROCK] = sSpriteAnim_TypeRock,
     [TYPE_BUG] = sSpriteAnim_TypeBug,
     [TYPE_GHOST] = sSpriteAnim_TypeGhost,
-    [TYPE_STEEL] = sSpriteAnim_TypeSteel,
     [TYPE_MYSTERY] = sSpriteAnim_TypeMystery,
-    [TYPE_FIRE] = sSpriteAnim_TypeFire,
-    [TYPE_WATER] = sSpriteAnim_TypeWater,
     [TYPE_GRASS] = sSpriteAnim_TypeGrass,
     [TYPE_ELECTRIC] = sSpriteAnim_TypeElectric,
     [TYPE_PSYCHIC] = sSpriteAnim_TypePsychic,
-    [TYPE_ICE] = sSpriteAnim_TypeIce,
     [TYPE_DRAGON] = sSpriteAnim_TypeDragon,
     [TYPE_DARK] = sSpriteAnim_TypeDark,
     [TYPE_FAIRY] = sSpriteAnim_TypeFairy,
     [TYPE_STELLAR] = sSpriteAnim_TypeStellar,
+
+    [TYPE_DEFAULT] = sSpriteAnim_TypeDefault,
+    [TYPE_STAR] = sSpriteAnim_TypeStar,
+    [TYPE_PUPPET] = sSpriteAnim_TypePuppet,
+    [TYPE_CAT] = sSpriteAnim_TypeCat,
+    [TYPE_ELEC] = sSpriteAnim_TypeElec,
+    [TYPE_HOLY] = sSpriteAnim_TypeHoly,
+    [TYPE_DEATH] = sSpriteAnim_TypeDeath,
+    [TYPE_SCYTHE] = sSpriteAnim_TypeScythe,
+    [TYPE_RUDE] = sSpriteAnim_TypeRude,
+    [TYPE_RED] = sSpriteAnim_TypeRed,
+    [TYPE_JEWEL] = sSpriteAnim_TypeJewel,
+    [TYPE_HEART] = sSpriteAnim_TypeHeart,
+    [TYPE_ORDER] = sSpriteAnim_TypeOrder,
+    [TYPE_RABBIT] = sSpriteAnim_TypeRabbit,
+    [TYPE_DUST] = sSpriteAnim_TypeDust,
+    [TYPE_FIGHT] = sSpriteAnim_TypeFight,
+    [TYPE_MOUSE] = sSpriteAnim_TypeMouse,
+    [TYPE_PUZZ] = sSpriteAnim_TypePuzz,
+    [TYPE_BLADE] = sSpriteAnim_TypeBlade,
+    [TYPE_ICE] = sSpriteAnim_TypeIce,
+    [TYPE_CHAOS] = sSpriteAnim_TypeChaos,
+    [TYPE_VIRUS] = sSpriteAnim_TypeVirus,
+    [TYPE_COLOR] = sSpriteAnim_TypeColor,
+    [TYPE_MUSIC] = sSpriteAnim_TypeMusic,
+    [TYPE_COPY] = sSpriteAnim_TypeCopy,
+    [TYPE_FROG] = sSpriteAnim_TypeFrog,
+    [TYPE_LUCK] = sSpriteAnim_TypeLuck,
+    [TYPE_WATER] = sSpriteAnim_TypeWater,
+    [TYPE_FIRE] = sSpriteAnim_TypeFire,
+    [TYPE_WIND] = sSpriteAnim_TypeWind,
+    [TYPE_SPIRIT] = sSpriteAnim_TypeSpirit,
+    [TYPE_STEEL] = sSpriteAnim_TypeSteel,
+    [TYPE_SMELL] = sSpriteAnim_TypeSmell,
+    [TYPE_MAGIC] = sSpriteAnim_TypeMagic,
+    
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_COOL] = sSpriteAnim_CategoryCool,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_BEAUTY] = sSpriteAnim_CategoryBeauty,
     [NUMBER_OF_MON_TYPES + CONTEST_CATEGORY_CUTE] = sSpriteAnim_CategoryCute,

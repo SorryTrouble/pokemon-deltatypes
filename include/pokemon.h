@@ -129,7 +129,7 @@ enum MonData {
 struct PokemonSubstruct0
 {
     u16 species:11; // 2047 species.
-    enum Type teraType:5; // 30 types.
+    // enum Type teraType:5; // 30 types.
     u16 heldItem:10; // 1023 items.
     u16 unused_02:6;
     u32 experience:21;
@@ -397,7 +397,7 @@ struct SpeciesInfo /*0xC4*/
     u8 baseSpDefense;
     enum Type types[2];
     u8 catchRate;
-    u8 forceTeraType;
+    // u8 forceTeraType;
     u16 expYield; // expYield was changed from u8 to u16 for the new Exp System.
     u16 evYield_HP:2;
     u16 evYield_Attack:2;
@@ -643,7 +643,7 @@ struct FormChangeContext
     u16 hp;
     u16 maxHP;
     u32 gmaxFactor:1;
-    enum Type teraType;
+    // enum Type teraType;
     u32 level:7;
     u32 padding:8;
 };

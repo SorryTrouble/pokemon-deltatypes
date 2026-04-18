@@ -3740,11 +3740,11 @@ static enum MoveEndResult MoveEndClearBits(void)
     if (gBattleMons[gBattlerAttacker].volatiles.destinyBond > 0)
         gBattleMons[gBattlerAttacker].volatiles.destinyBond--;
     // check if Stellar type boost should be used up
-    if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA
-     && GetBattlerTeraType(gBattlerAttacker) == TYPE_STELLAR
-     && GetMoveCategory(gCurrentMove) != DAMAGE_CATEGORY_STATUS
-     && IsTypeStellarBoosted(gBattlerAttacker, moveType))
-        ExpendTypeStellarBoost(gBattlerAttacker, moveType);
+    // if (GetActiveGimmick(gBattlerAttacker) == GIMMICK_TERA
+    //  && GetBattlerTeraType(gBattlerAttacker) == TYPE_STELLAR
+    //  && GetMoveCategory(gCurrentMove) != DAMAGE_CATEGORY_STATUS
+    //  && IsTypeStellarBoosted(gBattlerAttacker, moveType))
+    //     ExpendTypeStellarBoost(gBattlerAttacker, moveType);
     memset(gQueuedStatBoosts, 0, sizeof(gQueuedStatBoosts));
 
     for (enum BattlerId i = 0; i < gBattlersCount; i++)

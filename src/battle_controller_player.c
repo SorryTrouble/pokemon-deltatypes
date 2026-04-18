@@ -1717,12 +1717,12 @@ static void MoveSelectionDisplayMoveType(enum BattlerId battler)
     enum Type type = GetMoveType(move);
     enum BattleMoveEffects effect = GetMoveEffect(move);
 
-    if (effect == EFFECT_TERA_BLAST)
-    {
-        if (IsGimmickSelected(battler, GIMMICK_TERA) || GetActiveGimmick(battler) == GIMMICK_TERA)
-            type = GetBattlerTeraType(battler);
-    }
-    else if (effect == EFFECT_IVY_CUDGEL)
+    // if (effect == EFFECT_TERA_BLAST)
+    // {
+    //     if (IsGimmickSelected(battler, GIMMICK_TERA) || GetActiveGimmick(battler) == GIMMICK_TERA)
+    //         type = GetBattlerTeraType(battler);
+    // }
+    /*else*/ if (effect == EFFECT_IVY_CUDGEL)
     {
         if (speciesId == SPECIES_OGERPON_WELLSPRING || speciesId == SPECIES_OGERPON_WELLSPRING_TERA
          || speciesId == SPECIES_OGERPON_HEARTHFLAME || speciesId == SPECIES_OGERPON_HEARTHFLAME_TERA

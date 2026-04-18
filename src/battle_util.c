@@ -319,12 +319,12 @@ enum DamageCategory GetReflectDamageMoveDamageCategory(enum BattlerId battler, e
 
 static bool32 ShouldTeraShellDistortTypeMatchups(enum Move move, enum BattlerId battlerDef, enum Ability abilityDef)
 {
-    if (!gSpecialStatuses[battlerDef].distortedTypeMatchups
-     && gBattleMons[battlerDef].species == SPECIES_TERAPAGOS_TERASTAL
-     && gBattleMons[battlerDef].hp == gBattleMons[battlerDef].maxHP
-     && !IsBattleMoveStatus(move)
-     && abilityDef == ABILITY_TERA_SHELL)
-        return TRUE;
+    // if (!gSpecialStatuses[battlerDef].distortedTypeMatchups
+    //  && gBattleMons[battlerDef].species == SPECIES_TERAPAGOS_TERASTAL
+    //  && gBattleMons[battlerDef].hp == gBattleMons[battlerDef].maxHP
+    //  && !IsBattleMoveStatus(move)
+    //  && abilityDef == ABILITY_TERA_SHELL)
+    //     return TRUE;
 
     return FALSE;
 }
@@ -3465,13 +3465,13 @@ u32 AbilityBattleEffects(enum AbilityEffect caseID, enum BattlerId battler, enum
                 effect++;
             }
             break;
-        case ABILITY_TERAFORM_ZERO:
-            if (shouldAbilityTrigger && gBattleMons[battler].species == SPECIES_TERAPAGOS_STELLAR)
-            {
-                BattleScriptCall(BattleScript_ActivateTeraformZero);
-                effect++;
-            }
-            break;
+        // case ABILITY_TERAFORM_ZERO:
+        //     if (shouldAbilityTrigger && gBattleMons[battler].species == SPECIES_TERAPAGOS_STELLAR)
+        //     {
+        //         BattleScriptCall(BattleScript_ActivateTeraformZero);
+        //         effect++;
+        //     }
+        //     break;
         case ABILITY_INTREPID_SWORD:
             if (shouldAbilityTrigger && !GetBattlerPartyState(battler)->intrepidSwordBoost)
             {
@@ -6505,10 +6505,10 @@ static inline u32 CalcMoveBasePower(struct BattleContext *ctx)
         if (gBattleStruct->fickleBeamBoosted)
             basePower *= 2;
         break;
-    case EFFECT_TERA_BLAST:
-        if (GetActiveGimmick(battlerAtk) == GIMMICK_TERA && GetBattlerTeraType(battlerAtk) == TYPE_STELLAR)
-            basePower = 100;
-        break;
+    // case EFFECT_TERA_BLAST:
+    //     if (GetActiveGimmick(battlerAtk) == GIMMICK_TERA && GetBattlerTeraType(battlerAtk) == TYPE_STELLAR)
+    //         basePower = 100;
+    //     break;
     case EFFECT_LAST_RESPECTS:
         basePower += (basePower * min(100, GetBattlerSideFaintCounter(battlerAtk)));
         break;
@@ -6808,19 +6808,19 @@ static inline u32 CalcMoveBasePowerAfterModifiers(struct BattleContext *ctx)
     }
 
     // Terastallization boosts weak, non-priority, non-multi hit moves after modifiers to 60 BP.
-    if (GetActiveGimmick(battlerAtk) == GIMMICK_TERA
-        && (moveType == GetBattlerTeraType(battlerAtk)
-        || (GetBattlerTeraType(battlerAtk) == TYPE_STELLAR && IsTypeStellarBoosted(battlerAtk, moveType)))
-        && uq4_12_multiply_by_int_half_down(modifier, basePower) < 60
-        && GetMovePower(move) > 1
-        && GetMoveStrikeCount(move) < 2
-        && !IsMultiHitMove(move)
-        && moveEffect != EFFECT_POWER_BASED_ON_USER_HP
-        && moveEffect != EFFECT_POWER_BASED_ON_TARGET_HP
-        && GetMovePriority(move) == 0)
-    {
-        return 60;
-    }
+    // if (GetActiveGimmick(battlerAtk) == GIMMICK_TERA
+    //     && (moveType == GetBattlerTeraType(battlerAtk)
+    //     || (GetBattlerTeraType(battlerAtk) == TYPE_STELLAR && IsTypeStellarBoosted(battlerAtk, moveType)))
+    //     && uq4_12_multiply_by_int_half_down(modifier, basePower) < 60
+    //     && GetMovePower(move) > 1
+    //     && GetMoveStrikeCount(move) < 2
+    //     && !IsMultiHitMove(move)
+    //     && moveEffect != EFFECT_POWER_BASED_ON_USER_HP
+    //     && moveEffect != EFFECT_POWER_BASED_ON_TARGET_HP
+    //     && GetMovePriority(move) == 0)
+    // {
+    //     return 60;
+    // }
 
     return uq4_12_multiply_by_int_half_down(modifier, basePower);
 }
@@ -7747,10 +7747,10 @@ static inline s32 DoMoveDamageCalcVars(struct BattleContext *ctx)
 
 s32 ApplyModifiersAfterDmgRoll(struct BattleContext *ctx, s32 dmg)
 {
-    if (GetActiveGimmick(ctx->battlerAtk) == GIMMICK_TERA)
-        DAMAGE_APPLY_MODIFIER(GetTeraMultiplier(ctx));
-    else
-        DAMAGE_APPLY_MODIFIER(GetSameTypeAttackBonusModifier(ctx));
+    // if (GetActiveGimmick(ctx->battlerAtk) == GIMMICK_TERA)
+    //     DAMAGE_APPLY_MODIFIER(GetTeraMultiplier(ctx));
+    // else
+    DAMAGE_APPLY_MODIFIER(GetSameTypeAttackBonusModifier(ctx));
     DAMAGE_APPLY_MODIFIER(ctx->typeEffectivenessModifier);
     DAMAGE_APPLY_MODIFIER(GetBurnOrFrostBiteModifier(ctx));
     DAMAGE_APPLY_MODIFIER(GetZMaxMoveAgainstProtectionModifier(ctx));
@@ -8232,8 +8232,8 @@ static inline void MulByTypeEffectiveness(struct BattleContext *ctx, uq4_12_t *m
         mod = UQ_4_12(2.0);
     if (ctx->moveType == TYPE_GROUND && defType == TYPE_FLYING && IsBattlerGrounded(ctx->battlerDef, ctx->abilityDef, ctx->holdEffectDef) && mod == UQ_4_12(0.0))
         mod = UQ_4_12(1.0);
-    if (ctx->moveType == TYPE_STELLAR && GetActiveGimmick(ctx->battlerDef) == GIMMICK_TERA)
-        mod = UQ_4_12(2.0);
+    // if (ctx->moveType == TYPE_STELLAR && GetActiveGimmick(ctx->battlerDef) == GIMMICK_TERA)
+    //     mod = UQ_4_12(2.0);
 
     // B_WEATHER_STRONG_WINDS weakens Super Effective moves against Flying-type Pokémon
     if (ctx->weather & B_WEATHER_STRONG_WINDS && !ctx->isAnticipation)
@@ -8725,7 +8725,7 @@ u32 GetBattleFormChangeTargetSpecies(enum BattlerId battler, enum FormChanges me
         .gmaxFactor = GetMonData(GetBattlerMon(battler), MON_DATA_GIGANTAMAX_FACTOR),
         .hp = gBattleMons[battler].hp,
         .maxHP = gBattleMons[battler].maxHP,
-        .teraType = GetBattlerTeraType(battler),
+        // .teraType = GetBattlerTeraType(battler),
         .level = gBattleMons[battler].level,
     };
 
@@ -8755,13 +8755,13 @@ static bool32 CanBattlerFormChange(enum BattlerId battler, enum FormChanges meth
     case FORM_CHANGE_BATTLE_SWITCH_OUT:
         if (IsGigantamaxed(battler))
             return TRUE;
-        else if (GetActiveGimmick(battler) == GIMMICK_TERA && DoesSpeciesHaveFormChangeMethod(gBattleMons[battler].species, FORM_CHANGE_BATTLE_TURN_END))
+        else if (/*GetActiveGimmick(battler) == GIMMICK_TERA &&*/ DoesSpeciesHaveFormChangeMethod(gBattleMons[battler].species, FORM_CHANGE_BATTLE_TURN_END))
             return FALSE;
         break;
-    case FORM_CHANGE_BATTLE_TURN_END:
-        if (GetActiveGimmick(battler) == GIMMICK_TERA)
-            return FALSE;
-        break;
+    // case FORM_CHANGE_BATTLE_TURN_END:
+    //     if (GetActiveGimmick(battler) == GIMMICK_TERA)
+    //         return FALSE;
+    //     break;
     default:
         break;
     }
@@ -9733,23 +9733,23 @@ bool32 CanMonParticipateInSkyBattle(struct Pokemon *mon)
 void GetBattlerTypes(enum BattlerId battler, bool32 ignoreTera, enum Type types[static 3])
 {
     // Terastallization.
-    bool32 isTera = GetActiveGimmick(battler) == GIMMICK_TERA;
-    if (!ignoreTera && isTera)
-    {
-        enum Type teraType = GetBattlerTeraType(battler);
-        if (teraType != TYPE_STELLAR)
-        {
-            types[0] = types[1] = types[2] = teraType;
-            return;
-        }
-    }
+    // bool32 isTera = GetActiveGimmick(battler) == GIMMICK_TERA;
+    // if (!ignoreTera && isTera)
+    // {
+    //     enum Type teraType = GetBattlerTeraType(battler);
+    //     if (teraType != TYPE_STELLAR)
+    //     {
+    //         types[0] = types[1] = types[2] = teraType;
+    //         return;
+    //     }
+    // }
 
     types[0] = gBattleMons[battler].types[0];
     types[1] = gBattleMons[battler].types[1];
     types[2] = gBattleMons[battler].types[2];
 
     // Roost.
-    if (!isTera && gBattleMons[battler].volatiles.roostActive)
+    if (/*!isTera &&*/ gBattleMons[battler].volatiles.roostActive)
     {
         if (types[0] == TYPE_FLYING && types[1] == TYPE_FLYING)
             types[0] = types[1] = B_ROOST_PURE_FLYING >= GEN_5 ? TYPE_NORMAL : TYPE_MYSTERY;
@@ -9770,8 +9770,8 @@ enum Type GetBattlerType(enum BattlerId battler, u32 typeIndex, bool32 ignoreTer
 void RemoveBattlerType(enum BattlerId battler, enum Type type)
 {
     u32 i;
-    if (GetActiveGimmick(battler) == GIMMICK_TERA) // don't remove type if Terastallized
-        return;
+    // if (GetActiveGimmick(battler) == GIMMICK_TERA) // don't remove type if Terastallized
+    //     return;
     for (i = 0; i < 3; i++)
     {
         if (*(u8 *)(&gBattleMons[battler].types[0] + i) == type)

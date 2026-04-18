@@ -17,7 +17,7 @@ static bool32 UseDoubleBattleCoords(u32);
 static enum Type GetMonPublicType(enum BattlerId, u32);
 static bool32 ShouldHideUncaughtType(u32 species);
 static bool32 ShouldHideUnseenType(u32 species);
-static enum Type GetMonDefensiveTeraType(struct Pokemon *, struct Pokemon *, enum BattlerId, u32, u32, u32);
+// static enum Type GetMonDefensiveTeraType(struct Pokemon *, struct Pokemon *, enum BattlerId, u32, u32, u32);
 static bool32 IsIllusionActiveAndTypeUnchanged(struct Pokemon *, u32, enum BattlerId);
 
 static void CreateSpriteFromType(u32, bool32, enum Type[], u32, enum BattlerId);
@@ -304,8 +304,8 @@ static enum Type GetMonPublicType(enum BattlerId battlerId, u32 typeNum)
     monIllusion = GetIllusionMonPtr(battlerId);
     illusionSpecies = GetMonData(monIllusion,MON_DATA_SPECIES,NULL);
 
-    if (GetActiveGimmick(battlerId) == GIMMICK_TERA)
-        return GetMonDefensiveTeraType(mon,monIllusion,battlerId,typeNum,illusionSpecies,monSpecies);
+    // if (GetActiveGimmick(battlerId) == GIMMICK_TERA)
+    //     return GetMonDefensiveTeraType(mon,monIllusion,battlerId,typeNum,illusionSpecies,monSpecies);
 
     if (IsIllusionActiveAndTypeUnchanged(monIllusion,monSpecies, battlerId))
         return GetSpeciesType(illusionSpecies, typeNum);
@@ -335,18 +335,18 @@ static bool32 ShouldHideUnseenType(u32 species)
     return TRUE;
 }
 
-static enum Type GetMonDefensiveTeraType(struct Pokemon *mon, struct Pokemon *monIllusion, enum BattlerId battlerId, u32 typeNum, u32 illusionSpecies, u32 monSpecies)
-{
-    enum Type teraType = GetBattlerTeraType(battlerId);
-    u32 targetSpecies;
+// static enum Type GetMonDefensiveTeraType(struct Pokemon *mon, struct Pokemon *monIllusion, enum BattlerId battlerId, u32 typeNum, u32 illusionSpecies, u32 monSpecies)
+// {
+//     enum Type teraType = GetBattlerTeraType(battlerId);
+//     u32 targetSpecies;
 
-    if (teraType != TYPE_STELLAR)
-        return teraType;
+//     if (teraType != TYPE_STELLAR)
+//         return teraType;
 
-    targetSpecies = (monIllusion != NULL) ? illusionSpecies : monSpecies;
+//     targetSpecies = (monIllusion != NULL) ? illusionSpecies : monSpecies;
 
-    return GetSpeciesType(targetSpecies, typeNum);
-}
+//     return GetSpeciesType(targetSpecies, typeNum);
+// }
 
 static bool32 IsIllusionActiveAndTypeUnchanged(struct Pokemon *monIllusion, u32 monSpecies, enum BattlerId battlerId)
 {

@@ -1218,7 +1218,7 @@ static const u32 sCompressedStatuses[] =
 // 3) repurpose IDs from other items that aren't being used, like ITEM_GOLD_TEETH or ITEM_SS_TICKET until ITEMS_COUNT equals 1023, the max value that will fit in 10 bits.
 
 STATIC_ASSERT(NUM_SPECIES < (1 << 11), PokemonSubstruct0_species_TooSmall);
-STATIC_ASSERT(NUMBER_OF_MON_TYPES + 1 <= (1 << 5), PokemonSubstruct0_teraType_TooSmall);
+STATIC_ASSERT(NUMBER_OF_MON_TYPES + 1 <= (1 << 6), PokemonSubstruct0_teraType_TooSmall);
 STATIC_ASSERT(ITEMS_COUNT < (1 << 10), PokemonSubstruct0_heldItem_TooSmall);
 STATIC_ASSERT(MAX_LEVEL <= 100, PokemonSubstruct0_experience_PotentiallTooSmall); // Maximum of ~2 million exp.
 STATIC_ASSERT(POKEBALL_COUNT <= (1 << 6), PokemonSubstruct0_pokeball_TooSmall);
@@ -2870,24 +2870,24 @@ u32 GetBoxMonData3(struct BoxPokemon *boxMon, s32 field, u8 *data)
         case MON_DATA_GIGANTAMAX_FACTOR:
             retVal = GetSubstruct3(boxMon)->gigantamaxFactor;
             break;
-        case MON_DATA_TERA_TYPE:
-            {
-                struct PokemonSubstruct0 *substruct0 = GetSubstruct0(boxMon);
-                if (gSpeciesInfo[substruct0->species].forceTeraType)
-                {
-                    retVal = gSpeciesInfo[substruct0->species].forceTeraType;
-                }
-                else if (substruct0->teraType == TYPE_NONE) // Tera Type hasn't been modified so we can just use the personality
-                {
-                    const enum Type *types = gSpeciesInfo[substruct0->species].types;
-                    retVal = (boxMon->personality & 0x1) == 0 ? types[0] : types[1];
-                }
-                else
-                {
-                    retVal = substruct0->teraType;
-                }
-            }
-            break;
+        // case MON_DATA_TERA_TYPE:
+        //     {
+        //         struct PokemonSubstruct0 *substruct0 = GetSubstruct0(boxMon);
+        //         if (gSpeciesInfo[substruct0->species].forceTeraType)
+        //         {
+        //             retVal = gSpeciesInfo[substruct0->species].forceTeraType;
+        //         }
+        //         else if (substruct0->teraType == TYPE_NONE) // Tera Type hasn't been modified so we can just use the personality
+        //         {
+        //             const enum Type *types = gSpeciesInfo[substruct0->species].types;
+        //             retVal = (boxMon->personality & 0x1) == 0 ? types[0] : types[1];
+        //         }
+        //         else
+        //         {
+        //             retVal = substruct0->teraType;
+        //         }
+        //     }
+        //     break;
         case MON_DATA_EVOLUTION_TRACKER:
             {
                 struct PokemonSubstruct1 *substruct1 = GetSubstruct1(boxMon);
@@ -3314,12 +3314,12 @@ void SetBoxMonData(struct BoxPokemon *boxMon, s32 field, const void *dataArg)
         case MON_DATA_DYNAMAX_LEVEL:
             SET8(GetSubstruct3(boxMon)->dynamaxLevel);
             break;
-        case MON_DATA_GIGANTAMAX_FACTOR:
-            SET8(GetSubstruct3(boxMon)->gigantamaxFactor);
-            break;
-        case MON_DATA_TERA_TYPE:
-            SET8(GetSubstruct0(boxMon)->teraType);
-            break;
+        // case MON_DATA_GIGANTAMAX_FACTOR:
+        //     SET8(GetSubstruct3(boxMon)->gigantamaxFactor);
+        //     break;
+        // case MON_DATA_TERA_TYPE:
+        //     SET8(GetSubstruct0(boxMon)->teraType);
+        //     break;
         case MON_DATA_EVOLUTION_TRACKER:
         {
             union EvolutionTracker evoTracker;
@@ -6806,10 +6806,10 @@ u32 GetFormChangeTargetSpecies_Internal(struct FormChangeContext ctx)
             if (formChanges[i].param1 == ctx.ability)
                 targetSpecies = formChanges[i].targetSpecies;
             break;
-        case FORM_CHANGE_BATTLE_TERASTALLIZATION:
-            if (ctx.teraType == formChanges[i].param1)
-                targetSpecies = formChanges[i].targetSpecies;
-            break;
+        // case FORM_CHANGE_BATTLE_TERASTALLIZATION:
+        //     if (ctx.teraType == formChanges[i].param1)
+        //         targetSpecies = formChanges[i].targetSpecies;
+        //     break;
         case FORM_CHANGE_BATTLE_BEFORE_MOVE:
         case FORM_CHANGE_BATTLE_AFTER_MOVE:
             if (formChanges[i].param1 == gCurrentMove

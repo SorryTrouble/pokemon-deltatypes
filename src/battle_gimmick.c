@@ -77,10 +77,10 @@ bool32 ShouldTrainerBattlerUseGimmick(enum BattlerId battler, enum Gimmick gimmi
     // Check the trainer party data to see if a gimmick is intended.
     else
     {
-        if (gimmick == GIMMICK_TERA && gBattleStruct->opponentMonCanTera & 1 << gBattlerPartyIndexes[battler])
-            return TRUE;
-        if (gimmick == GIMMICK_DYNAMAX && gBattleStruct->opponentMonCanDynamax & 1 << gBattlerPartyIndexes[battler])
-            return TRUE;
+        // if (gimmick == GIMMICK_TERA && gBattleStruct->opponentMonCanTera & 1 << gBattlerPartyIndexes[battler])
+        //     return TRUE;
+        // if (gimmick == GIMMICK_DYNAMAX && gBattleStruct->opponentMonCanDynamax & 1 << gBattlerPartyIndexes[battler])
+        //     return TRUE;
     }
     #endif
 
@@ -268,7 +268,7 @@ void LoadIndicatorSpritesGfx(void)
 {
     LoadSpritePalette(&sSpritePalette_MiscIndicator);
     LoadSpritePalette(&sSpritePalette_MegaIndicator);
-    LoadSpritePalette(&sSpritePalette_TeraIndicator);
+    // LoadSpritePalette(&sSpritePalette_TeraIndicator);
 }
 
 static void SpriteCb_GimmickIndicator(struct Sprite *sprite)
@@ -296,10 +296,10 @@ const u32 *GetIndicatorSpriteSrc(enum BattlerId battler)
         else
             return (u32 *)&sAlphaIndicatorGfx;
     }
-    else if (gimmick == GIMMICK_TERA) // special case
-    {
-        return (u32 *)sTeraIndicatorDataPtrs[GetBattlerTeraType(battler)];
-    }
+    // else if (gimmick == GIMMICK_TERA) // special case
+    // {
+    //     return (u32 *)sTeraIndicatorDataPtrs[GetBattlerTeraType(battler)];
+    // }
     else if (gGimmicksInfo[gimmick].indicatorData != NULL)
     {
         return (u32 *)gGimmicksInfo[gimmick].indicatorData;
