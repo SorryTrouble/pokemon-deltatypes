@@ -110,9 +110,9 @@ static const u8 sStarterLabelCoords[STARTER_MON_COUNT][2] =
     {8, 4},
 };
 
-#define GRASS_STARTER (IS_FRLG ? SPECIES_BULBASAUR  : SPECIES_TREECKO)
-#define FIRE_STARTER  (IS_FRLG ? SPECIES_CHARMANDER : SPECIES_TORCHIC)
-#define WATER_STARTER (IS_FRLG ? SPECIES_SQUIRTLE   : SPECIES_MUDKIP )
+#define GRASS_STARTER (IS_FRLG ? SPECIES_BULBASAUR  : SPECIES_GROOKEY)
+#define FIRE_STARTER  (IS_FRLG ? SPECIES_CHARMANDER : SPECIES_CYNDAQUIL)
+#define WATER_STARTER (IS_FRLG ? SPECIES_SQUIRTLE   : SPECIES_OSHAWOTT)
 
 static const u16 sStarterMon[STARTER_MON_COUNT] =
 {
@@ -526,9 +526,23 @@ static void Task_WaitForStarterSprite(u8 taskId)
 
 static void Task_AskConfirmStarter(u8 taskId)
 {
+    DebugPrintf("tStarterSelection: %u", gTasks[taskId].tStarterSelection);
+
     PlayCry_Normal(GetStarterPokemon(gTasks[taskId].tStarterSelection), 0);
     FillWindowPixelBuffer(0, PIXEL_FILL(1));
-    AddTextPrinterParameterized(0, FONT_NORMAL, gText_ConfirmStarterChoice, 0, 1, 0, NULL);
+    //display different text for the different types
+    switch(gTasks[taskId].tStarterSelection){
+        case 0: //grass
+           AddTextPrinterParameterized(0, FONT_NORMAL, gText_ConfirmStarterChoiceGrass, 0, 1, 0, NULL);
+           break;
+        case 1: //fire
+            AddTextPrinterParameterized(0, FONT_NORMAL, gText_ConfirmStarterChoiceFire, 0, 1, 0, NULL);
+            break;
+        case 2: //water
+            AddTextPrinterParameterized(0, FONT_NORMAL, gText_ConfirmStarterChoiceWater, 0, 1, 0, NULL);
+            break; 
+    }
+    // AddTextPrinterParameterized(0, FONT_NORMAL, gText_ConfirmStarterChoice, 0, 1, 0, NULL);
     ScheduleBgCopyTilemapToVram(0);
     CreateYesNoMenu(&sWindowTemplate_ConfirmStarter, 0x2A8, 0xD, 0);
     gTasks[taskId].func = Task_HandleConfirmStarterInput;

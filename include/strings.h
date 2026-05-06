@@ -232,7 +232,9 @@ extern const u8 gText_Birch_YourePlayer[];
 extern const u8 gText_Birch_AreYouReady[];
 
 extern const u8 gText_BirchInTrouble[];
-extern const u8 gText_ConfirmStarterChoice[];
+extern const u8 gText_ConfirmStarterChoiceGrass[];
+extern const u8 gText_ConfirmStarterChoiceFire[];
+extern const u8 gText_ConfirmStarterChoiceWater[];
 
 // mystery event menu text
 extern const u8 gText_EventSafelyLoaded[];
