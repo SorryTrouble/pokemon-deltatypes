@@ -5690,7 +5690,8 @@ enum Obedience GetAttackerObedienceForAction(void)
     if (FlagGet(FLAG_BADGE08_GET)) // Rain Badge, ignore obedience altogether
         return OBEYS;
 
-    obedienceLevel = 10;
+    //obedienceLevel = 10;
+    obedienceLevel = 100;
 
     if (FlagGet(FLAG_BADGE01_GET)) // Stone Badge
         obedienceLevel = 20;
@@ -6867,6 +6868,10 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
 {
     u8 atkStage;
     u32 atkStat;
+    u32 physAttack = 0; //used for rude buster
+    u32 specAttack = 0; //used for rude buster
+    uq4_12_t physModifier; //used for rude buster
+    uq4_12_t specModifier; //used for rude buster
     uq4_12_t modifier;
     u16 atkBaseSpeciesId;
     enum BattlerId battlerAtk = ctx->battlerAtk;
@@ -6907,6 +6912,56 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
             atkStage = gBattleMons[battlerAtk].statStages[STAT_SPDEF];
         }
     }
+    else if (moveEffect == EFFECT_RUDE_BUSTER){
+
+        DebugPrintf("Rude Buster");
+
+        //we want attack stages to apply only to the affected stat. For example, swords dance rude buster would calc as ((atk * 2) + spatk) / 2
+        //                                                          Instead of ((atk + spatk) * 2) / 2
+        //we will apply the stat change bonus here, then reset to default so the computation doesn't happen at the end of this if
+
+        physAttack = gBattleMons[battlerAtk].attack;
+        specAttack = gBattleMons[battlerAtk].spAttack;
+
+        //apply phys attack
+        atkStage = gBattleMons[battlerAtk].statStages[STAT_ATK];
+        // critical hits ignore attack stat's stage drops
+        if (ctx->isCrit && atkStage < DEFAULT_STAT_STAGE)
+            atkStage = DEFAULT_STAT_STAGE;
+        // pokemon with unaware ignore attack stat changes while taking damage
+        if (ctx->abilityDef == ABILITY_UNAWARE)
+            atkStage = DEFAULT_STAT_STAGE;
+
+        //apply the stat change
+
+        physAttack *= gStatStageRatios[atkStage][0];
+        physAttack /= gStatStageRatios[atkStage][1];
+
+        //apply special attack
+        atkStage = gBattleMons[battlerAtk].statStages[STAT_SPATK];
+        // critical hits ignore attack stat's stage drops
+        if (ctx->isCrit && atkStage < DEFAULT_STAT_STAGE)
+            atkStage = DEFAULT_STAT_STAGE;
+        // pokemon with unaware ignore attack stat changes while taking damage
+        if (ctx->abilityDef == ABILITY_UNAWARE)
+            atkStage = DEFAULT_STAT_STAGE;
+
+        //apply the stat change
+        specAttack *= gStatStageRatios[atkStage][0];
+        specAttack /= gStatStageRatios[atkStage][1];
+
+        DebugPrintf("atk: %u, spec: %u", physAttack, specAttack);
+
+        //reset the stat changes, so they aren't applied again
+        atkStage = DEFAULT_STAT_STAGE;
+
+        //take average of attack and special attack
+        // atkStat = (physAttack + specAttack) / 2;
+        //placeholder
+        atkStat = 1;
+
+        // DebugPrintf("atkStat: %u", atkStat);
+    }
     else
     {
         if (IsBattleMovePhysical(move))
@@ -6934,6 +6989,12 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
     // apply attack stat modifiers
     modifier = UQ_4_12(1.0);
 
+    //used only for rude buster
+    physModifier = UQ_4_12(1.0);
+    specModifier = UQ_4_12(1.0);
+
+    DebugPrintf("Before modification: %u, %u, %u", modifier, physModifier, specModifier);
+
     if (ctx->isSelfInflicted)
         return uq4_12_multiply_by_int_half_down(ApplyOffensiveBadgeBoost(modifier, battlerAtk, move), atkStat);
 
@@ -6944,18 +7005,40 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
     case ABILITY_PURE_POWER:
         if (IsBattleMovePhysical(move))
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+        if(moveEffect == EFFECT_RUDE_BUSTER)
+            physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(2.0));
+        DebugPrintf("Huge Power mod: %u", physModifier);
         break;
     case ABILITY_SLOW_START:
-        if (gBattleMons[battlerAtk].volatiles.slowStartTimer > 0 && IsBattleMovePhysical(move))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.5));
+        if (gBattleMons[battlerAtk].volatiles.slowStartTimer > 0){
+            if(IsBattleMovePhysical(move)){
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.5));
+            } else if(moveEffect == EFFECT_RUDE_BUSTER){
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(0.5));
+            }
+            DebugPrintf("Slow Start mod: %u", physModifier);
+        }
         break;
     case ABILITY_SOLAR_POWER:
-        if (IsBattleMoveSpecial(move) && IsBattlerWeatherAffected(battlerAtk, B_WEATHER_SUN))
+        if (IsBattleMoveSpecial(move) && IsBattlerWeatherAffected(battlerAtk, B_WEATHER_SUN)){
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER){
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.5));
+            }
+            DebugPrintf("solar power mod: %u", specModifier);
+        }
         break;
     case ABILITY_DEFEATIST:
-        if (gBattleMons[battlerAtk].hp <= (gBattleMons[battlerAtk].maxHP / 2))
+        if (gBattleMons[battlerAtk].hp <= (gBattleMons[battlerAtk].maxHP / 2)){
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.5));
+        
+            if(moveEffect == EFFECT_RUDE_BUSTER){
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(0.5));
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(0.5));
+
+                DebugPrintf("defeatest mod: %u, %u", physModifier, specModifier);
+            }
+        }
         break;
     case ABILITY_FLASH_FIRE:
         if (moveType == TYPE_FIRE && gBattleMons[battlerAtk].volatiles.flashFireBoosted)
@@ -6982,8 +7065,15 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
         {
             enum Ability partnerAbility = GetBattlerAbility(BATTLE_PARTNER(battlerAtk));
             if (partnerAbility == ABILITY_MINUS
-            || (B_PLUS_MINUS_INTERACTION >= GEN_5 && partnerAbility == ABILITY_PLUS))
+            || (B_PLUS_MINUS_INTERACTION >= GEN_5 && partnerAbility == ABILITY_PLUS)){
+
                 modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+                if(moveEffect == EFFECT_RUDE_BUSTER)
+                    specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.5));
+                
+                DebugPrintf("plus mod: %u", specModifier);
+                
+            }
         }
         break;
     case ABILITY_MINUS:
@@ -6991,25 +7081,55 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
         {
             enum Ability partnerAbility = GetBattlerAbility(BATTLE_PARTNER(battlerAtk));
             if (partnerAbility == ABILITY_PLUS
-            || (B_PLUS_MINUS_INTERACTION >= GEN_5 && partnerAbility == ABILITY_MINUS))
+            || (B_PLUS_MINUS_INTERACTION >= GEN_5 && partnerAbility == ABILITY_MINUS)){
+
                 modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+                if(moveEffect == EFFECT_RUDE_BUSTER)
+                    specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.5));
+                
+                DebugPrintf("minus mod: %u", specModifier);
+            }
         }
         break;
     case ABILITY_FLOWER_GIFT:
-        if (gBattleMons[battlerAtk].species == SPECIES_CHERRIM_SUNSHINE && IsBattlerWeatherAffected(battlerAtk, B_WEATHER_SUN) && IsBattleMovePhysical(move))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        if (gBattleMons[battlerAtk].species == SPECIES_CHERRIM_SUNSHINE && IsBattlerWeatherAffected(battlerAtk, B_WEATHER_SUN)){
+            if(IsBattleMovePhysical(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+            DebugPrintf("flower fift mod: %u", physModifier);
+        }
         break;
     case ABILITY_HUSTLE:
         if (IsBattleMovePhysical(move))
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        if(moveEffect == EFFECT_RUDE_BUSTER)
+            physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+        
+        DebugPrintf("hustle mod: %u", physModifier);
         break;
     case ABILITY_STAKEOUT:
-        if (gBattleStruct->battlerState[battlerDef].isFirstTurn == 2) // just switched in
+        DebugPrintf("Ability is stakeout");
+        if (gBattleStruct->battlerState[battlerDef].isFirstTurn == 2){ // just switched in
+            DebugPrintf("It's the turn to empower");
             modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+            if(moveEffect == EFFECT_RUDE_BUSTER){
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(2.0));
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(2.0));
+
+                DebugPrintf("stakeout mod: %u, %u", physModifier, specModifier);
+            }
+        }
         break;
     case ABILITY_GUTS:
-        if (gBattleMons[battlerAtk].status1 & STATUS1_ANY && IsBattleMovePhysical(move))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        if (gBattleMons[battlerAtk].status1 & STATUS1_ANY){
+            if(IsBattleMovePhysical(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+            
+            DebugPrintf("guts mod: %u", physModifier);
+        }
         break;
     case ABILITY_TRANSISTOR:
         if (moveType == TYPE_ELECTRIC)
@@ -7025,10 +7145,13 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
             modifier = uq4_12_multiply(modifier, UQ_4_12(1.5));
         break;
     case ABILITY_GORILLA_TACTICS:
-        if (IsBattleMovePhysical(move)
-         && !IsGimmickSelected(battlerAtk, GIMMICK_DYNAMAX)
-         && GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX)
-            modifier = uq4_12_multiply(modifier, UQ_4_12(1.5));
+        if (!IsGimmickSelected(battlerAtk, GIMMICK_DYNAMAX)
+         && GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX){
+            if(IsBattleMovePhysical(move))
+                modifier = uq4_12_multiply(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+        }
         break;
     case ABILITY_ROCKY_PAYLOAD:
         if (moveType == TYPE_ROCK)
@@ -7042,6 +7165,14 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
             {
                 if ((IsBattleMovePhysical(move) && atkHighestStat == STAT_ATK) || (IsBattleMoveSpecial(move) && atkHighestStat == STAT_SPATK))
                     modifier = uq4_12_multiply(modifier, UQ_4_12(1.3));
+                if(moveEffect == EFFECT_RUDE_BUSTER){
+                    if(atkHighestStat == STAT_ATK)
+                        physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.3));
+                    if(atkHighestStat == STAT_SPATK)
+                        specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.3));
+                    
+                    DebugPrintf("protosynthesis mod: %u, %u", physModifier, specModifier);
+                }
             }
         }
         break;
@@ -7053,17 +7184,35 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
             {
                 if ((IsBattleMovePhysical(move) && atkHighestStat == STAT_ATK) || (IsBattleMoveSpecial(move) && atkHighestStat == STAT_SPATK))
                     modifier = uq4_12_multiply(modifier, UQ_4_12(1.3));
+                if(moveEffect == EFFECT_RUDE_BUSTER){
+                    if(atkHighestStat == STAT_ATK)
+                        physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.3));
+                    if(atkHighestStat == STAT_SPATK)
+                        specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.3));
+                    
+                    DebugPrintf("Quark Drive mod: %u, %u", physModifier, specModifier);
+                }
             }
         }
         break;
     case ABILITY_ORICHALCUM_PULSE:
-        if (ctx->weather & B_WEATHER_SUN && IsBattleMovePhysical(move)
-         && ctx->holdEffectAtk != HOLD_EFFECT_UTILITY_UMBRELLA)
-           modifier = uq4_12_multiply(modifier, UQ_4_12(1.3333));
+        if (ctx->weather & B_WEATHER_SUN && ctx->holdEffectAtk != HOLD_EFFECT_UTILITY_UMBRELLA)
+            if(IsBattleMovePhysical(move))
+               modifier = uq4_12_multiply(modifier, UQ_4_12(1.3333));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.3333));
+            
+            DebugPrintf("Orichalcum pulse mod: %u", physModifier);
         break;
     case ABILITY_HADRON_ENGINE:
         if (ctx->fieldStatuses & STATUS_FIELD_ELECTRIC_TERRAIN && IsBattleMoveSpecial(move))
-           modifier = uq4_12_multiply(modifier, UQ_4_12(1.3333));
+            if(IsBattleMoveSpecial(move))
+                modifier = uq4_12_multiply(modifier, UQ_4_12(1.3333));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.3333));
+
+            DebugPrintf("hardon engine mod: %u", specModifier);
+
         break;
     default:
         break;
@@ -7098,8 +7247,15 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
         switch (GetBattlerAbility(BATTLE_PARTNER(battlerAtk)))
         {
         case ABILITY_FLOWER_GIFT:
-            if (gBattleMons[BATTLE_PARTNER(battlerAtk)].species == SPECIES_CHERRIM_SUNSHINE && IsBattlerWeatherAffected(BATTLE_PARTNER(battlerAtk), B_WEATHER_SUN) && IsBattleMovePhysical(move))
-                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if (gBattleMons[BATTLE_PARTNER(battlerAtk)].species == SPECIES_CHERRIM_SUNSHINE && IsBattlerWeatherAffected(BATTLE_PARTNER(battlerAtk), B_WEATHER_SUN)){
+                if(IsBattleMovePhysical(move)){
+                    modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+                }
+                if(moveEffect == EFFECT_RUDE_BUSTER){
+                    physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+                    DebugPrintf("flower gift ally mod: %u", physModifier);
+                }
+            }
             break;
         default:
             break;
@@ -7107,40 +7263,111 @@ static inline u32 CalcAttackStat(struct BattleContext *ctx)
     }
 
     // Ruin field effects
-    if (IsBattleMoveSpecial(move) && !gBattleMons[ctx->battlerAtk].volatiles.vesselOfRuin && IsRuinStatusActive(VOLATILE_VESSEL_OF_RUIN))
-        modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.75));
+    if (!gBattleMons[ctx->battlerAtk].volatiles.vesselOfRuin && IsRuinStatusActive(VOLATILE_VESSEL_OF_RUIN)){
+        if(IsBattleMoveSpecial(move))
+            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.75));
+        if(moveEffect == EFFECT_RUDE_BUSTER)
+            specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(0.75));
+        DebugPrintf("vessel of ruin mod: %u", specModifier);
+    }
 
-    if (IsBattleMovePhysical(move) && !gBattleMons[ctx->battlerAtk].volatiles.tabletsOfRuin && IsRuinStatusActive(VOLATILE_TABLETS_OF_RUIN))
-        modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.75));
+    if (!gBattleMons[ctx->battlerAtk].volatiles.tabletsOfRuin && IsRuinStatusActive(VOLATILE_TABLETS_OF_RUIN)){
+        if(IsBattleMovePhysical(move))
+            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(0.75));
+        if(moveEffect == EFFECT_RUDE_BUSTER)
+            physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(0.75));
+        DebugPrintf("Tablets of ruin mod: %u", physModifier);
+    }
+        
 
     // attacker's hold effect
     switch (ctx->holdEffectAtk)
     {
     case HOLD_EFFECT_THICK_CLUB:
-        if ((atkBaseSpeciesId == SPECIES_CUBONE || atkBaseSpeciesId == SPECIES_MAROWAK) && IsBattleMovePhysical(move))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+        if ((atkBaseSpeciesId == SPECIES_CUBONE || atkBaseSpeciesId == SPECIES_MAROWAK)){
+            if(IsBattleMovePhysical(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(2.0));
+            
+            DebugPrintf("thick club mod: %u", physModifier);
+        }
         break;
     case HOLD_EFFECT_DEEP_SEA_TOOTH:
-        if (gBattleMons[battlerAtk].species == SPECIES_CLAMPERL && IsBattleMoveSpecial(move))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+        if (gBattleMons[battlerAtk].species == SPECIES_CLAMPERL){
+            if(IsBattleMoveSpecial(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(2.0));
+            
+            DebugPrintf("deep sea tooth mod: %u", specModifier);
+        }
         break;
     case HOLD_EFFECT_LIGHT_BALL:
-        if (atkBaseSpeciesId == SPECIES_PIKACHU && (GetConfig(B_LIGHT_BALL_ATTACK_BOOST) >= GEN_4 || IsBattleMoveSpecial(move)))
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+        if (atkBaseSpeciesId == SPECIES_PIKACHU){
+            if(GetConfig(B_LIGHT_BALL_ATTACK_BOOST) >= GEN_4 || IsBattleMoveSpecial(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(2.0));
+            if(moveEffect == EFFECT_RUDE_BUSTER){
+                if(GetConfig(B_LIGHT_BALL_ATTACK_BOOST) < GEN_4){
+                    physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(2.0)); 
+                }
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(2.0));
+                
+                DebugPrintf("light ball mod: %u", specModifier);
+            }
+        }
         break;
     case HOLD_EFFECT_CHOICE_BAND:
-        if (IsBattleMovePhysical(move) && GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX)
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        if (GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX){
+            if(IsBattleMovePhysical(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                physModifier = uq4_12_multiply_half_down(physModifier, UQ_4_12(1.5));
+            
+            DebugPrintf("Choice band mod: %u", physModifier);
+        }
         break;
     case HOLD_EFFECT_CHOICE_SPECS:
-        if (IsBattleMoveSpecial(move) && GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX)
-            modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+        if (GetActiveGimmick(battlerAtk) != GIMMICK_DYNAMAX){
+            if(IsBattleMoveSpecial(move))
+                modifier = uq4_12_multiply_half_down(modifier, UQ_4_12(1.5));
+            if(moveEffect == EFFECT_RUDE_BUSTER)
+                specModifier = uq4_12_multiply_half_down(specModifier, UQ_4_12(1.5));
+            
+            DebugPrintf("choice specs mod: %u", specModifier);
+        }
         break;
     default:
         break;
     }
 
-    modifier = ApplyOffensiveBadgeBoost(modifier, battlerAtk, move);
+    DebugPrintf("attacking: %u, physatk: %u, specatk: %u", battlerAtk, physAttack, specAttack);
+    DebugPrintf("modifier: %u, physmodifier: %u, specialmodifier: %u, default: %u", modifier, physModifier, specModifier);
+
+    if(moveEffect == EFFECT_RUDE_BUSTER){
+        //since we use the average of attack and special attack, we want modifiers to only affect that stat.
+
+        //apply badge boost to the modifier
+        if (ShouldGetStatBadgeBoost(B_FLAG_BADGE_BOOST_ATTACK, battlerAtk))
+            physModifier = uq4_12_multiply_half_down(physModifier, GetBadgeBoostModifier());
+        if (ShouldGetStatBadgeBoost(B_FLAG_BADGE_BOOST_SPATK, battlerAtk) && IsBattleMoveSpecial(move))
+            specModifier = uq4_12_multiply_half_down(specModifier, GetBadgeBoostModifier());
+
+        //apply the modifier to corresponding attack
+        physAttack = uq4_12_multiply_by_int_half_down(physModifier, physAttack);
+        specAttack = uq4_12_multiply_by_int_half_down(specModifier, specAttack);
+        DebugPrintf("Modified phys and spec attack: %u, %u", physAttack, specAttack);
+
+        //average the modified phys and spec attack into the attacking stat
+        atkStat = (physAttack + specAttack) / 2;
+        
+        //reset modifier, so it isn't applied again
+        modifier = UQ_4_12(1.0);
+    } else {
+        modifier = ApplyOffensiveBadgeBoost(modifier, battlerAtk, move);
+    }
+
+    DebugPrintf("modified atkstat: %u", uq4_12_multiply_by_int_half_down(modifier, atkStat));
 
     return uq4_12_multiply_by_int_half_down(modifier, atkStat);
 }

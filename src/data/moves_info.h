@@ -21403,6 +21403,27 @@ const struct MoveInfo gMovesInfo[MOVES_COUNT_ALL] =
         .battleAnimScript = gBattleAnimMove_MalignantChain,
     },
 
+    [MOVE_RUDE_BUSTER] =
+    {
+        .name = COMPOUND_STRING("Rude Buster"),
+        .description = COMPOUND_STRING(
+            "Deals RUDE damage, using\n"
+            "Attack and Special Attack"),
+        .effect = EFFECT_RUDE_BUSTER,
+        .power = 100,
+        .type = TYPE_RUDE,
+        .accuracy = 100,
+        .pp = 15,
+        .target = TARGET_SELECTED,
+        .priority = 0,
+        .category = DAMAGE_CATEGORY_SPECIAL,
+        // .additionalEffects = ADDITIONAL_EFFECTS({
+        //     .moveEffect = MOVE_EFFECT_TOXIC,
+        //     .chance = 50,
+        // }),
+        .battleAnimScript = gBattleAnimMove_MalignantChain,
+    },
+
     // Z-Moves
     [MOVE_BREAKNECK_BLITZ] =
     {

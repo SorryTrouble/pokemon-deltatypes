@@ -907,7 +907,12 @@ enum __attribute__((packed)) Move
 
     // Add any custom moves here, not further down!
 
-    MOVES_COUNT = MOVES_COUNT_GEN9,
+    //Deltamoves
+    MOVE_RUDE_BUSTER = 848,
+
+    MOVES_COUNT_DELTA,
+
+    MOVES_COUNT = MOVES_COUNT_DELTA,
 
     // Z Moves
     FIRST_Z_MOVE = MOVES_COUNT,
